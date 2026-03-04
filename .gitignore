@@ -1,0 +1,35 @@
+# =============================================================================
+# BoxLang Azure Functions - Git Ignore
+# =============================================================================
+
+# Java / Maven build output
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+# IDE
+.idea/
+*.iml
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment secrets — never commit this
+.env
+
+# Azure Functions local settings (may contain secrets)
+local.settings.json
+
+# Maven wrapper (if not checked in)
+.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+*.log
