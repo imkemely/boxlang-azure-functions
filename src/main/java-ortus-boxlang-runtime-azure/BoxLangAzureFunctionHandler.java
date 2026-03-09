@@ -64,8 +64,7 @@ public class BoxLangAzureFunctionHandler {
     // -------------------------------------------------------------------------
 
     /**
-     * Default constructor – used by the Azure Functions host via reflection.
-     * Wires up collaborators from their singletons / default instances.
+     * Default constructor – used by the Azure Functions host via reflection. Wires up collaborators from their singletons / default instances.
      */
     public BoxLangAzureFunctionHandler() {
         this(
@@ -95,10 +94,9 @@ public class BoxLangAzureFunctionHandler {
     // -------------------------------------------------------------------------
 
     /**
-     * Handles every inbound HTTP request directed at this function app.
-     *
-     * The wildcard route {@code {*path}} ensures that all sub-paths under {@code /api/} are captured here and forwarded to the matching BoxLang script.  
-     * The script file name is derived from the last path segment so that a request to {@code /api/hello} executes {@code <scriptRoot>/hello.bx}.
+     * Handles every inbound HTTP request directed at this function app. The wildcard route {@code {*path}} ensures that all sub-paths under {@code /api/} 
+     * are captured here and forwarded to the matching BoxLang script. The script file name is derived from the last path segment so that a request to 
+     * {@code /api/hello} executes {@code <scriptRoot>/hello.bx}.
      *
      * @param request the Azure HTTP request (body wrapped in {@link Optional})
      * @param context the Azure invocation context (logging, metadata, tracing)
@@ -341,11 +339,11 @@ public class BoxLangAzureFunctionHandler {
     }
 
     /**
-     * Minimal JSON string escaping – escapes double-quotes and backslashes so
-     * that error messages can be safely embedded in a JSON string literal.
+     * Minimal JSON string escaping – escapes double-quotes and backslashes so that error messages can be safely embedded in a JSON string literal.
      */
     private String escapeJson(String value) {
         if (value == null) return "";
         return value.replace("\\", "\\\\").replace("\"", "\\\"");
     }
 }
+
