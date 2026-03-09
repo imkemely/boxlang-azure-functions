@@ -11,14 +11,10 @@ import java.util.Objects;
 import java.util.logging.Level;
 
 /**
- * Bridges Microsoft Azure's {@link ExecutionContext} to a BoxLang-compatible
- * context representation.
- * Azure Functions provides invocation metadata and logging through
- * {@link ExecutionContext}. BoxLang expects its own {@code IBoxContext} / scope
- * model. This adapter translates between the two so that BoxLang scripts can
- * access Azure-specific metadata (function name, invocation ID, tracing headers)
- * through standard BoxLang scope variables, while also routing their log
- * statements to the Azure Functions host logger.
+ * Bridges Microsoft Azure's {@link ExecutionContext} to a BoxLang-compatible context representation. Azure Functions provides invocation metadata and 
+ * logging through {@link ExecutionContext}. BoxLang expects its own {@code IBoxContext} / scope model. This adapter translates between the two so that 
+ * BoxLang scripts can access Azure-specific metadata (function name, invocation ID, tracing headers) through standard BoxLang scope variables, while 
+ * also routing their log statements to the Azure Functions host logger.
  *
  * Scope variables injected into BoxLang
  * azure.functionName – name registered with the Functions host
@@ -27,10 +23,8 @@ import java.util.logging.Level;
  * env.* – copies of all process environment variables
  * 
  * Logging bridge
- * BoxLang log calls are forwarded to the {@link java.util.logging.Logger}
- * obtained from {@link ExecutionContext#getLogger()}. This ensures that all
- * function output appears in Application Insights / Azure Monitor under the
- * correct invocation ID.
+ * BoxLang log calls are forwarded to the {@link java.util.logging.Logger} obtained from {@link ExecutionContext#getLogger()}. This ensures that all
+ * function output appears in Application Insights / Azure Monitor under the correct invocation ID.
  */
 
 public class AzureContextAdapter {
@@ -42,11 +36,8 @@ public class AzureContextAdapter {
     // -------------------------------------------------------------------------
 
     /**
-     * Creates a BoxLang-compatible context map from the Azure
-     * {@link ExecutionContext}.
-     *
-     * The returned map is used by {@link BoxLangFunctionExecutor} to populate
-     * the BoxLang runtime's request-scoped variables before script execution.
+     * Creates a BoxLang-compatible context map from the Azure {@link ExecutionContext}. The returned map is used by {@link BoxLangFunctionExecutor} to 
+     * populate the BoxLang runtime's request-scoped variables before script execution.
      *
      * @param executionContext the Azure invocation context; must not be {@code null}
      * @return mutable map of context variables (never {@code null})
@@ -79,8 +70,7 @@ public class AzureContextAdapter {
     // -------------------------------------------------------------------------
 
     /**
-     * Builds a simple string-to-string map of the Azure-specific metadata that
-     * BoxLang scripts are most likely to need.
+     * Builds a simple string-to-string map of the Azure-specific metadata that BoxLang scripts are most likely to need.
      *
      * @param ctx the Azure execution context
      * @return metadata map; never {@code null}
@@ -103,22 +93,18 @@ public class AzureContextAdapter {
 
     /**
      * Logs a message at the given SLF4J level through both:
-     *   The SLF4J logger (appears in the application's own log pipeline), and</li>
-     *   The Azure {@link java.util.logging.Logger} obtained from the
-     *   {@link ExecutionContext} (appears in Application Insights under the
-     *   correct invocation ID).
+     *   The SLF4J logger (appears in the application's own log pipeline)
+     *   The Azure {@link java.util.logging.Logger} obtained from the {@link ExecutionContext} (appears in Application Insights under the correct invocation ID).
      *
      * @param executionContext the current Azure invocation context
-     * @param level            SLF4J level name ({@code "DEBUG"}, {@code "INFO"},
-     *                         {@code "WARN"}, {@code "ERROR"})
+     * @param level            SLF4J level name ({@code "DEBUG"}, {@code "INFO"}, {@code "WARN"}, {@code "ERROR"})
      * @param message          the log message
      */
   
     public void log(ExecutionContext executionContext, String level, String message) {
         Objects.requireNonNull(executionContext, "executionContext must not be null");
 
-        // Forward to the Azure host logger so the message is correlated with this
-        // invocation in Application Insights.
+        // Forward to the Azure host logger so the message is correlated with this invocation in Application Insights.
         java.util.logging.Logger azureLogger = executionContext.getLogger();
         Level julLevel = toJulLevel(level);
         azureLogger.log(julLevel, "[{0}] {1}", new Object[]{executionContext.getInvocationId(), message});
@@ -161,12 +147,8 @@ public class AzureContextAdapter {
     // -------------------------------------------------------------------------
 
     /**
-     * Extracts distributed-tracing context from the Azure
-     * {@link ExecutionContext}.
-     *
-     * Azure Functions propagates W3C TraceContext and (optionally) Correlation
-     * ID headers through the execution context. When present, these values are
-     * surfaced here so that BoxLang scripts can forward them to downstream
+     * Extracts distributed-tracing context from the Azure {@link ExecutionContext}. Azure Functions propagates W3C TraceContext and (optionally) Correlation
+     * ID headers through the execution context. When present, these values are surfaced here so that BoxLang scripts can forward them to downstream
      * services to maintain end-to-end trace continuity.
      *
      * @param ctx the Azure execution context
@@ -176,13 +158,11 @@ public class AzureContextAdapter {
         Map<String, String> trace = new HashMap<>();
         if (ctx == null) return trace;
 
-        // invocationId can double as a correlation ID when no explicit trace header
-        // is provided by the caller.
+        // invocationId can double as a correlation ID when no explicit trace header is provided by the caller.
         trace.put("invocationId", safeInvocationId(ctx));
         trace.put("functionName", safeFunctionName(ctx));
 
-        // Azure Functions >= 4.x exposes a TraceContext via the ExecutionContext.
-        // We attempt to access it reflectively so that this adapter compiles
+        // Azure Functions >= 4.x exposes a TraceContext via the ExecutionContext. We attempt to access it reflectively so that this adapter compiles
         // against older SDK versions that don't have it.
         try {
             java.lang.reflect.Method getTraceContext =
@@ -210,8 +190,8 @@ public class AzureContextAdapter {
     // -------------------------------------------------------------------------
 
     /**
-     * Injects Azure-specific variables into a BoxLang scope map so that scripts
-     * can access them via standard scope lookups (e.g. {@code variables.azure.invocationId}).
+     * Injects Azure-specific variables into a BoxLang scope map so that scripts can access them via standard scope lookups (
+     * e.g. {@code variables.azure.invocationId}).
      *
      * @param scope           the BoxLang scope map to populate
      * @param executionContext the Azure context for this invocation
@@ -231,8 +211,7 @@ public class AzureContextAdapter {
     }
 
     /**
-     * Verifies that two context maps are isolated from one another (i.e. modifying
-     * one does not affect the other).  Used by the executor to validate that
+     * Verifies that two context maps are isolated from one another (i.e. modifying one does not affect the other). Used by the executor to validate that
      * concurrent requests do not bleed state across invocations.
      *
      * @param contextA first context map
@@ -287,3 +266,4 @@ public class AzureContextAdapter {
         }
     }
 }
+
