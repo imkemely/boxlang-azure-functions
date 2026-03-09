@@ -17,11 +17,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Transforms an Azure {@link HttpRequestMessage} into a BoxLang-compatible request structure.
- * Azure Functions exposes raw HTTP data ({@link URI}, {@link com.microsoft.azure.functions.HttpMethod}
- * enums, {@code Optional<String>} bodies) rather than the pre-parsed objects provided by AWS Lambda. 
- * This class bridges that gap by normalising the request into a plain {@code Map<String, Object>} that 
- * the BoxLang runtime can consume via its standard CGI-variable, URL-scope, and form-scope conventions.
+ * Transforms an Azure {@link HttpRequestMessage} into a BoxLang-compatible request structure. Azure Functions exposes raw HTTP data 
+ * ({@link URI}, {@link com.microsoft.azure.functions.HttpMethod} enums, {@code Optional<String>} bodies) rather than the pre-parsed objects 
+ * provided by AWS Lambda. This class bridges that gap by normalising the request into a plain {@code Map<String, Object>} that the BoxLang 
+ * runtime can consume via its standard CGI-variable, URL-scope, and form-scope conventions.
  
  * Output Map Structure
  * {
@@ -47,8 +46,7 @@ public class AzureRequestMapper {
     // -------------------------------------------------------------------------
 
     /**
-     * Maps an Azure {@link HttpRequestMessage} to a BoxLang-compatible request map.
-     * This is the primary entry point used by {@link BoxLangAzureFunctionHandler}.
+     * Maps an Azure {@link HttpRequestMessage} to a BoxLang-compatible request map. This is the primary entry point used by {@link BoxLangAzureFunctionHandler}.
      * @param request the Azure HTTP request; must not be {@code null}
      * @return mutable map containing all normalised request data
      */
@@ -131,8 +129,7 @@ public class AzureRequestMapper {
     // -------------------------------------------------------------------------
 
     /**
-     * Extracts the raw path component from a {@link URI}, without query string.
-     * Example: {@code https://example.com/api/users?foo=bar} → {@code /api/users}
+     * Extracts the raw path component from a {@link URI}, without query string. Example: {@code https://example.com/api/users?foo=bar} → {@code /api/users}
      */
     private String extractPath(URI uri) {
         if (uri == null) {
@@ -207,9 +204,8 @@ public class AzureRequestMapper {
     // -------------------------------------------------------------------------
 
     /**
-     * Safely extracts the raw request body string from the Azure request.
-     * Azure wraps the body in an {@link Optional} to indicate that a body may legitimately be absent (e.g. for GET requests). This method unwraps it, 
-     * returning {@code null} for absent bodies.
+     * Safely extracts the raw request body string from the Azure request. Azure wraps the body in an {@link Optional} to indicate that a body 
+     * may legitimately be absent (e.g. for GET requests). This method unwraps it, returning {@code null} for absent bodies.
      */
     private String extractBody(HttpRequestMessage<?> request) {
         Object body = request.getBody();
@@ -404,9 +400,8 @@ public class AzureRequestMapper {
     // -------------------------------------------------------------------------
 
     /**
-     * Builds a map of CGI-style environment variables from the request, matching the conventions that BoxLang's CGI scope expects.
-     *
-     * These variables allow BoxLang scripts written for CFML/BoxLang servers to run unmodified on Azure Functions by reading standard {@code CGI.REQUEST_METHOD},
+     * Builds a map of CGI-style environment variables from the request, matching the conventions that BoxLang's CGI scope expects. These variables 
+     * allow BoxLang scripts written for CFML/BoxLang servers to run unmodified on Azure Functions by reading standard {@code CGI.REQUEST_METHOD},
      * {@code CGI.HTTP_HOST}, etc.
      *
      * @param request normalised headers (lower-case keys)
@@ -460,3 +455,4 @@ public class AzureRequestMapper {
     }
 
 } 
+
