@@ -1,5 +1,4 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
   "scriptFile": "../boxlang-azure-functions-1.0.0-SNAPSHOT-shaded.jar",
   "entryPoint": "ortus.boxlang.runtime.azure.BoxLangAzureFunctionHandler.run",
   "bindings": [
