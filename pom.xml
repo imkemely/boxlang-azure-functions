@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- ============================================================== -->
+    <!-- PROJECT METADATA                                                -->
+    <!-- This identifies your project in the Maven ecosystem.            -->
+    <!-- groupId + artifactId + version = unique project identifier.     -->
+    <!-- ============================================================== -->
+    <groupId>ortus.boxlang.runtime</groupId>
+    <artifactId>boxlang-azure-functions</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>BoxLang Azure Functions Runtime</name>
+    <description>BoxLang runtime adapter for Microsoft Azure Functions</description>
+
+    <!-- ============================================================== -->
+    <!-- PROPERTIES                                                      -->
+    <!-- Centralized version numbers and settings. Referencing these      -->
+    <!-- here means you only change a version in one place.              -->
+    <!-- ============================================================== -->
+    <properties>
+        <!-- Build settings -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+
+        <!-- Dependency versions -->
+        <azure.functions.java.library.version>3.1.0</azure.functions.java.library.version>
+        <junit.jupiter.version>5.10.0</junit.jupiter.version>
+        <mockito.version>5.5.0</mockito.version>
+        <assertj.version>3.24.0</assertj.version>
+        <slf4j.version>2.0.9</slf4j.version>
+        <logback.version>1.4.11</logback.version>
+        <boxlang.version>1.11.0</boxlang.version>
+
+        <!-- Azure deployment settings (read from environment variables) -->
+        <functionAppName>${env.AZURE_FUNCTION_APP_NAME}</functionAppName>
+        <functionAppRegion>${env.AZURE_REGION}</functionAppRegion>
+        <functionResourceGroup>${env.AZURE_RESOURCE_GROUP}</functionResourceGroup>
+    </properties>
+
+    <!-- ============================================================== -->
+    <!-- DEPENDENCIES                                                    -->
+    <!-- Libraries your project needs. Maven downloads these             -->
+    <!-- automatically and includes them in the build.                   -->
+    <!-- "scope: test" means it's only available during testing.         -->
+    <!-- ============================================================== -->
+    <dependencies>
+
+        <!-- Azure Functions Java API -->
+        <!-- Provides the annotations and types like @FunctionName,      -->
+        <!-- HttpRequestMessage, ExecutionContext that Azure requires.    -->
+        <dependency>
+            <groupId>com.microsoft.azure.functions</groupId>
+            <artifactId>azure-functions-java-library</artifactId>
+            <version>${azure.functions.java.library.version}</version>
+        </dependency>
+
+        <!-- Logging: SLF4J API (the interface your code writes to) -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <!-- Logging: Logback (the implementation that actually outputs logs) -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+        <!-- ======== TEST DEPENDENCIES ======== -->
+
+        <!-- JUnit 5: The main testing framework -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mockito: Creates fake (mock) objects for testing -->
+        <!-- e.g., faking an Azure ExecutionContext without a real Azure connection -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Mockito JUnit 5 integration -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- AssertJ: Readable assertion syntax for tests -->
+        <!-- e.g., assertThat(response.getStatus()).isEqualTo(200) -->
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.boxlang</groupId>
+            <artifactId>boxlang</artifactId>
+            <version>${boxlang.version}</version>
+        </dependency>
+
+    </dependencies>
+
+    <!-- ============================================================== -->
+    <!-- BUILD PLUGINS                                                   -->
+    <!-- Plugins extend Maven's build process. Each one handles a        -->
+    <!-- specific task like compiling, testing, packaging, or deploying. -->
+    <!-- ============================================================== -->
+    <build>
+        <plugins>
+
+            <!-- Compiler plugin: tells Maven which Java version to use -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+
+            <!-- Surefire plugin: runs unit tests (files ending in *Test.java) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.2</version>
+            </plugin>
+
+            <!-- Shade plugin: packages everything into one fat JAR -->
+            <!-- Azure Functions needs a single JAR with all dependencies -->
+            <!-- included, not separate library files.                    -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Azure Functions Maven plugin: deploy to Azure -->
+            <plugin>
+                <groupId>com.microsoft.azure</groupId>
+                <artifactId>azure-functions-maven-plugin</artifactId>
+                <version>1.33.0</version>
+                <configuration>
+                    <appName>${functionAppName}</appName>
+                    <resourceGroup>${functionResourceGroup}</resourceGroup>
+                    <region>${functionAppRegion}</region>
+                    <runtime>
+                        <os>linux</os>
+                        <javaVersion>21</javaVersion>
+                    </runtime>
+                </configuration>
+            </plugin>
+
+            <!-- JaCoCo plugin: measures code coverage during tests -->
+            <!-- Enforces minimum 80% coverage — build fails if below. -->
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.10</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>INSTRUCTION</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.80</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+</project>
