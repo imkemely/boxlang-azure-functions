@@ -1,3 +1,14 @@
+/**
+ * BoxLangFunctionExecutor
+ *
+ * Manages BoxLang runtime lifecycle and script execution.
+ * Handles singleton runtime initialization, script compilation
+ * caching, and thread-safe concurrent execution.
+ *
+ * TODO: Person 2 will implement this class.
+ * See Prompt 2.4 in AI_Prompts_BoxLang_x_Azure.docx for full specification.
+ */
+
 package ortus.boxlang.runtime.azure;
 
 import ortus.boxlang.runtime.BoxRuntime;
@@ -6,6 +17,7 @@ import ortus.boxlang.runtime.context.IBoxContext;
 import ortus.boxlang.runtime.context.ScriptingRequestBoxContext;
 import ortus.boxlang.runtime.interop.DynamicObject;
 import ortus.boxlang.runtime.runnables.IClassRunnable;
+import ortus.boxlang.runtime.runnables.IBoxRunnable;
 import ortus.boxlang.runtime.runnables.RunnableLoader;
 import ortus.boxlang.runtime.scopes.Key;
 import ortus.boxlang.runtime.types.IStruct;
@@ -228,7 +240,7 @@ public class BoxLangFunctionExecutor {
 
             // 5. Invoke the run() method: run( event, context, response ). Arguments are passed directly — no scope injection needed — mirroring the AWS 
             //    Lambda runner approach exactly.
-            DynamicObject.of(classRunnable).invoke(requestContext, Key.of("run"), new Object[]{ eventStruct, contextStruct, responseStruct });
+            DynamicObject.of(classRunnable).invoke(requestContext, "run", new Object[]{ eventStruct, contextStruct, responseStruct });
 
             // 6. Convert the response IStruct back to a plain Java Map for the handler.
             Map<String, Object> result = structToMap(responseStruct);
@@ -241,7 +253,7 @@ public class BoxLangFunctionExecutor {
 
             return result;
 
-        } catch (FileNotFoundException | BoxLangExecutionException e) {
+        } catch (BoxLangExecutionException e) {
             throw e;
         } catch (Exception e) {
             throw new BoxLangExecutionException("Unhandled error executing script: " + resolvedPath, e);
@@ -284,11 +296,11 @@ public class BoxLangFunctionExecutor {
             responseStruct.put(Key.of("body"), "{}");
             responseStruct.put(Key.of("headers"), new Struct());
 
-            DynamicObject.of(classRunnable).invoke(requestContext, Key.of(methodName), new Object[]{ eventStruct, contextStruct, responseStruct });
+            DynamicObject.of(classRunnable).invoke(requestContext, methodName, new Object[]{ eventStruct, contextStruct, responseStruct });
 
             return structToMap(responseStruct);
 
-        } catch (FileNotFoundException | BoxLangExecutionException e) {
+        } catch (BoxLangExecutionException e) {
             throw e;
         } catch (Exception e) {
             throw new BoxLangExecutionException("Error invoking " + methodName + " on " + resolvedPath, e);
@@ -392,7 +404,8 @@ public class BoxLangFunctionExecutor {
         try {
             logger.debug("Loading BoxLang class: {}", absolutePath);
             ResolvedFilePath resolvedFilePath = ResolvedFilePath.of(absolutePath);
-            IClassRunnable runnable = RunnableLoader.getInstance().loadClass(resolvedFilePath, ctx);
+            Class<IBoxRunnable> clazz = RunnableLoader.getInstance().loadClass(resolvedFilePath, ctx);
+            IClassRunnable runnable = (IClassRunnable) clazz.getDeclaredConstructor().newInstance();
             logger.debug("BoxLang class loaded: {}", absolutePath);
             return runnable;
         } catch (Exception e) {
