@@ -178,7 +178,7 @@ public class BoxLangAzureFunctionHandler {
      * @return relative script path segment (no leading slash, no script root)
      * @throws IllegalArgumentException if the URI is missing or the path is empty
      */
-    String resolveScriptPath(HttpRequestMessage<?> request) {
+    public String resolveScriptPath(HttpRequestMessage<?> request) {
         if (request.getUri() == null) {
             throw new IllegalArgumentException("Request URI is null");
         }
