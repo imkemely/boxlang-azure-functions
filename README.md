@@ -159,34 +159,30 @@ boxlang-azure-functions/
 ├── .env.example                  # Environment variable template
 ├── .gitignore                    # Git exclusions
 ├── .dockerignore                 # Docker build exclusions
-├── DEV_SETUP.md                  # Team setup instructions
 ├── README.md                     # This file
 ├── src/
-│   ├── main/
-│   │   ├── java/ortus/boxlang/runtime/azure/
-│   │   │   ├── BoxLangAzureFunctionHandler.java
-│   │   │   ├── AzureContextAdapter.java
-│   │   │   ├── BoxLangFunctionExecutor.java
-│   │   │   ├── AzureRequestMapper.java
-│   │   │   └── config/
-│   │   │       ├── BoxLangAzureConfig.java
-│   │   │       └── FunctionConfiguration.java
-│   │   └── resources/
-│   │       ├── function.json           # Azure Functions trigger config
-│   │       ├── host.json               # Function app settings
-│   │       └── boxlang-azure.properties # BoxLang runtime config
-│   └── test/
-│       └── java/ortus/boxlang/runtime/azure/
-│           ├── BoxLangAzureFunctionHandlerTest.java
-│           ├── AzureContextAdapterTest.java
-│           ├── BoxLangFunctionExecutorTest.java
-│           ├── AzureRequestMapperTest.java
-│           └── integration/
-│               └── EndToEndIntegrationTest.java
-└── docs/
-    ├── architecture.md
-    ├── getting-started.md
-    └── troubleshooting.md
+    ├── main/
+    │   ├── java/ortus/boxlang/runtime/azure/
+    │   │   ├── BoxLangAzureFunctionHandler.java
+    │   │   ├── AzureContextAdapter.java
+    │   │   ├── BoxLangFunctionExecutor.java
+    │   │   ├── AzureRequestMapper.java
+    │   │   └── config/
+    │   │       ├── BoxLangAzureConfig.java
+    │   │       └── FunctionConfiguration.java
+    │   └── resources/
+    │       ├── function.json           # Azure Functions trigger config
+    │       ├── host.json               # Function app settings
+    │       └── boxlang-azure.properties # BoxLang runtime config
+    └── test/
+        └── java/ortus/boxlang/runtime/azure/
+            ├── BoxLangAzureFunctionHandlerTest.java
+            ├── AzureContextAdapterTest.java
+            ├── BoxLangFunctionExecutorTest.java
+            ├── AzureRequestMapperTest.java
+            └── integration/
+                └── EndToEndIntegrationTest.java
+
 ```
 
 ---
