@@ -1,0 +1,21 @@
+# Dependencies and build output
+target/
+*.jar
+*.class
+
+# IDE files
+../../Desktop/Hope/.idea/
+*.iml
+.vscode/
+!.vscode/settings.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment secrets
+.env
+
+# Git
+.git
+.gitignore

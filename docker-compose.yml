@@ -1,0 +1,35 @@
+# =============================================================================
+# BoxLang Azure Functions - Docker Compose
+# Usage:
+#   docker compose up -d          Start the dev container
+#   docker compose exec dev bash  Open a shell inside the container
+#   docker compose down            Stop and remove the container
+# =============================================================================
+
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: boxlang-azure-dev
+    volumes:
+      # Mount the project directory into the container so edits sync in real-time
+      - .:/workspace
+      # Persist Maven local repository between container restarts (avoids re-downloading)
+      - maven-cache:/root/.m2
+    ports:
+      # Azure Functions local runtime port
+      - "7071:7071"
+    environment:
+      # Azure configuration — each team member sets these in their .env file
+      - AZURE_FUNCTION_APP_NAME=${AZURE_FUNCTION_APP_NAME:-boxlang-func-dev}
+      - AZURE_REGION=${AZURE_REGION:-eastus}
+      - AZURE_RESOURCE_GROUP=${AZURE_RESOURCE_GROUP:-boxlang-rg-dev}
+    # Keep the container running so you can exec into it
+    stdin_open: true
+    tty: true
+    working_dir: /workspace
+
+volumes:
+  maven-cache:
+    name: boxlang-maven-cache

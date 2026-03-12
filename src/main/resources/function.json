@@ -1,0 +1,20 @@
+{
+  "scriptFile": "../boxlang-azure-functions-1.0.0-SNAPSHOT.jar",
+  "entryPoint": "ortus.boxlang.runtime.azure.BoxLangAzureFunctionHandler.run",
+  "bindings": [
+    {
+      "type": "httpTrigger",
+      "direction": "in",
+      "name": "req",
+      "methods": ["get", "post", "put", "delete", "patch", "options"],
+      "route": "{*path}",
+      "authLevel": "anonymous"
+    },
+    {
+      "type": "http",
+      "direction": "out",
+      "name": "$return"
+    }
+  ]
+}
+
